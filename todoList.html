@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project-Todos</title>
+</head>
+<body>
+  <h1>Todo List</h1>
+
+  <div>
+    <button onClick="handlers.toggleAll()">Toggle All</button>
+  </div>
+
+  <div>
+    <button onClick="handlers.addTodo()">Add</button>
+    <input id="addTodoTextInput" type="text">
+  </div>
+
+  <div>
+    <button onClick="handlers.changeTodo()">Change Todo</button>
+    <input id="changeTodoPositionInput" type="number">
+    <input id="changeTodoTextInput" type="text">
+  </div>
+
+  <!-- <div>
+    <button onClick="handlers.toggleCompleted()">Toggle Completed</button>
+    <input id="toggleCompletedPositionInput" type="number">
+  </div> -->
+
+  <ul>
+  </ul>
+  <script>
+   const todoList = {
+  todos: [],
+  addTodo: function(todoText) {
+    this.todos.push({
+      todoText: todoText,
+      completed: false
+    });
+  },
+  changeTodo: function(position, todoText) {
+    this.todos[position].todoText = todoText;
+  },
+  deleteTodo: function(position) {
+    this.todos.splice(position, 1);
+  },
+  toggleCompleted: function(position) {
+    let todo = this.todos[position];
+    todo.completed = !todo.completed;
+  },
+  toggleAll: function() {
+    let totalTodos = this.todos.length;
+    let completedTodos = 0;
+
+
+    this.todos.forEach(function(todo) {
+      if (todo.completed === true) {
+        completedTodos++;
+      }
+    });
+
+    this.todos.forEach(function(todo) {
+
+      if (completedTodos === totalTodos) {
+        todo.completed = false;
+
+      } else {
+        todo.completed = true;
+      }
+    });
+  }
+};
+
+const handlers = {
+  addTodo: function() {
+    const addTodoTextInput = document.getElementById('addTodoTextInput');
+    todoList.addTodo(addTodoTextInput.value);
+    addTodoTextInput.value = '';
+    view.displayTodos();
+  },
+  changeTodo: function() {
+    const changeTodoPositionInput = document.getElementById('changeTodoPositionInput');
+    const changeTodoTextInput = document.getElementById('changeTodoTextInput');
+    todoList.changeTodo(changeTodoPositionInput.valueAsNumber, changeTodoTextInput.value);
+    changeTodoPositionInput.value = '';
+    changeTodoTextInput.value = '';
+    view.displayTodos();
+  },
+  deleteTodo: function(position) {
+    todoList.deleteTodo(position);
+    view.displayTodos();
+  },
+  toggleCompleted: function(position) {
+        todoList.toggleCompleted(position);
+        view.displayTodos();
+  },
+  toggleAll: function() {
+    todoList.toggleAll();
+    view.displayTodos();
+  }
+};
+
+const view = {
+  displayTodos: function() {
+    const todosUl = document.querySelector('ul');
+    todosUl.innerHTML = '';
+
+    todoList.todos.forEach(function(todo, position) {
+      const todoLi = document.createElement('li');
+        let todoTextWithCompletion = '';
+
+        if (todo.completed === true) {
+          todoTextWithCompletion = '(x) ' + todo.todoText;
+        } else {
+          todoTextWithCompletion = '( ) ' + todo.todoText;
+        }
+        todoLi.id = position;
+        todoLi.textContent = todoTextWithCompletion;
+        todoLi.appendChild(this.createDeleteButton());
+        todosUl.appendChild(todoLi);
+        todoLi.appendChild(this.createToggleButton());
+        todosUl.appendChild(todoLi);
+    }, this);
+  },
+  createDeleteButton: function() {
+    const deleteButton = document.createElement('button');
+    deleteButton.textContent = 'Delete';
+    deleteButton.className = 'deleteButton';
+    return deleteButton;
+  },
+  createToggleButton: function() {
+    const ToggleButton = document.createElement('button');
+    ToggleButton.textContent = 'Toggle';
+    ToggleButton.className = 'ToggleButton';
+    return ToggleButton;
+;
+  },
+  setUpEventListeners: function() {
+    const todosUl = document.querySelector('ul');
+
+    todosUl.addEventListener('click', function(event) {
+
+      const elementClicked = event.target;
+
+      if (elementClicked.className === 'deleteButton') {
+        handlers.deleteTodo(parseInt(elementClicked.parentNode.id));
+      }
+      if (elementClicked.className === 'ToggleButton')
+      {
+        handlers.toggleCompleted(parseInt(elementClicked.parentNode.id));
+
+      }
+
+    });
+  }
+};
+
+view.setUpEventListeners();
+  </script>
+</body>
+</html>
